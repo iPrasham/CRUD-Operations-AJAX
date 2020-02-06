@@ -8,7 +8,33 @@ $(document).ready(function() {
 	$("#signUpDiv").hide();
 	$("#loginDiv").show();
 	$("#homeDiv").hide();
+
+
+	$("#name").focus(function(){
+		$("#nameError").text("");
+	});
+
+	$("#phone").focus(function(){
+		$("#phoneError").text("");
+	});
+
+	$("#email").focus(function(){
+		$("#signUpEmailError").text("");
+	});
+
+	$("#password").focus(function(){
+		$("#signUpPasswordError").text("");
+	});
+
 	
+	$("#loginEmail").focus(function(){
+		$("#loginEmailError").text("");
+	});
+
+	$("#loginPassword").focus(function(){
+		$("#loginPasswordError").text("");
+	});
+
 	
 	
 	$("#aHome").on("click", function(){
@@ -19,6 +45,9 @@ $(document).ready(function() {
 			$("#loginDiv").show();
 			$("#homeDiv").hide();
 			alert("Please Login");
+			$("#aSignUp").parent().removeClass("active");
+			$("#aLogin").parent().addClass("active");
+
 		} 
 		else{
 			$("#signUpDiv").hide();
@@ -55,12 +84,34 @@ $(document).ready(function() {
 	
 	$("#signUpButton").on("click", function() 
 	{
+		var signUpFlag = 0;
 		var name= $("#name").val();
 		var email = $("#email").val();
                 var password= $("#password").val();
 		var phone = $("#phone").val();
-		//var data = $("#ajaxForm").serialize();
 
+		if(!(/^[A-Z]{1}[a-zA-Z\s]{1,50}$/.test(name))){
+			$("#nameError").text("Please provide a valid name");
+			signUpFlag = 1;
+		}
+
+		if(!(/^[6-9]\d{9}$/.test(phone))){
+			$("#phoneError").text("Please provide a valid phone number");
+			signUpFlag = 1;
+		}
+
+		if(!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))){
+			$("#signUpEmailError").text("Please provide a valid email address");
+			signUpFlag = 1;
+		}
+
+		if(!(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*]).{8,22}$/.test(password))){
+			$("#signUpPasswordError").text("Please provide the password according to specified criteria");
+			signUpFlag = 1;
+		}
+
+
+		if(signUpFlag == 0){
 		$.ajax({
                     type: "POST",
                     url: "phpFunctions.php?signup=true",
@@ -82,15 +133,31 @@ $(document).ready(function() {
 
 		    	}
 		});
+	}
 	});
 
 		$("#loginButton").on("click", function() 
 		{
-			var email = $("#loginEmail").val();
-                	var password= $("#loginPassword").val();
+			var loginEmail = $("#loginEmail").val();
+                	var loginPassword= $("#loginPassword").val();
+			var loginFlag = 0;
+			
+			if(!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(loginEmail))){
+				$("#loginEmailError").text("Please provide a valid email address");
+				loginFlag = 1;
+			}
+
+			if(!(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%\^&\*]).{8,22}$/.test(loginPassword))){
+				$("#loginPasswordError").text("Please provide the password according to specified criteria");
+				loginFlag = 1;
+			}
+
+		
+			if(loginFlag == 0){
+
 			var user = {
-				email: email,
-				password: password
+				email: loginEmail,
+				password: loginPassword
 			};
 			console.log(user);
 			var jsonUser = JSON.stringify(user);
@@ -102,9 +169,9 @@ $(document).ready(function() {
                     url: "phpFunctions.php?login=true",
                     data: { jsonUser: jsonUser },
 		    success: function(data) {
-			    	if(data != 0){
+			    	if(data){
 					alert("Login Successfully");
-					//console.log(data);
+					console.log(data);
 					session = true;
 					userArray = JSON.parse(data);
 					console.log(userArray);
@@ -120,6 +187,7 @@ $(document).ready(function() {
 				}
 				else{
 					alert('Invalid username/password');
+					console.log(data);
 					$("#signUpDiv").hide();
 			    		$("#loginDiv").show();
 			    		$("#homeDiv").hide();
@@ -130,9 +198,15 @@ $(document).ready(function() {
 					//$("#aLogin").parent().removeClass("active");
 
 				}
-		    	}
+		    	
+			}
+		
 		});
+	
+	}
 	});
+
+	
 
 	$("#showUsersButton").on("click", function(){
 

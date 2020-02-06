@@ -15,7 +15,9 @@
 
 		<script src="jqueryAjax.js"></script>
 
-
+		<style>
+			span { color: red; }
+		</style>
 
 	</head>		
 
